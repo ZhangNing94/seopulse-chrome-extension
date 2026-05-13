@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SEOPulse</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="logo">🔍 SEOPulse</div>
+    <div id="scoreBadge" class="score-badge">--</div>
+  </header>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Analyzing page SEO...</p>
+  </div>
+
+  <div id="results" class="hidden">
+    <div class="scorebar" id="scorebar">
+      <div class="scorebar-fill" id="scorebarFill"></div>
+    </div>
+
+    <div class="checks-list" id="checksList"></div>
+
+    <section class="section">
+      <h3>📊 Content</h3>
+      <div class="info-row"><span>Word Count</span><span id="wordCount">--</span></div>
+      <div class="info-row"><span>Links</span><span id="links">--</span></div>
+      <div class="info-row"><span>Language</span><span id="language">--</span></div>
+    </section>
+
+    <section class="section">
+      <h3>🏷️ Heading Structure</h3>
+      <div class="heading-bars" id="headingBars">
+        <div class="hbar"><span class="hbar-label">H1</span><span class="hbar-count" id="h1Count">0</span></div>
+        <div class="hbar"><span class="hbar-label">H2</span><span class="hbar-count" id="h2Count">0</span></div>
+        <div class="hbar"><span class="hbar-label">H3</span><span class="hbar-count" id="h3Count">0</span></div>
+        <div class="hbar"><span class="hbar-label">H4</span><span class="hbar-count" id="h4Count">0</span></div>
+        <div class="hbar"><span class="hbar-label">H5</span><span class="hbar-count" id="h5Count">0</span></div>
+        <div class="hbar"><span class="hbar-label">H6</span><span class="hbar-count" id="h6Count">0</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>🔗 Social Preview</h3>
+      <div class="social-tabs">
+        <button class="social-tab active" data-preview="google">Google</button>
+        <button class="social-tab" data-preview="twitter">Twitter</button>
+      </div>
+      <div class="preview-card google-preview" id="googlePreview">
+        <div class="gp-url" id="gpUrl">--</div>
+        <div class="gp-title" id="gpTitle">No title found</div>
+        <div class="gp-desc" id="gpDesc">No description found</div>
+      </div>
+      <div class="preview-card twitter-preview hidden" id="twitterPreview">
+        <div class="tw-img" id="twImg"><span>No image</span></div>
+        <div class="tw-title" id="twTitle">No Twitter title</div>
+        <div class="tw-desc" id="twDesc">No Twitter description</div>
+        <div class="tw-url" id="twUrl">--</div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button id="copyReport" class="btn btn-primary">📋 Copy Report</button>
+    </div>
+
+    <footer>
+      <p>Your data stays local. No tracking.</p>
+      <p class="version">SEOPulse v1.0.0</p>
+    </footer>
+  </div>
+
+  <div id="error" class="hidden">
+    <p>⚠️ Unable to analyze this page.</p>
+    <p class="error-hint">Try reloading or check if this is an internal Chrome page.</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
