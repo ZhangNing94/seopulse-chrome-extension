@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SEOPulse - SEO Audit Tool",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "One-click on-page SEO audit with scoring, heading analysis, social preview, and structured data check. All local.",
   "icons": {
     "16": "icons/icon16.png",
@@ -19,10 +19,6 @@
   "permissions": [
     "activeTab",
     "scripting"
-  ],
-  "host_permissions": [
-    "https://*/*",
-    "http://*/*"
   ],
   "commands": {
     "_execute_action": {
