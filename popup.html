@@ -11,6 +11,43 @@
     <div id="scoreBadge" class="score-badge">--</div>
   </header>
 
+  <!-- Pro Section -->
+  <div id="proSection" class="pro-section">
+    <div id="proFree">
+      <div class="pro-free-top">
+        <button id="upgradeProBtn" class="pro-upgrade-btn"> Upgrade to Pro · $4.99</button>
+        <span id="usageDisplay" class="usage-badge">3 free audits today</span>
+      </div>
+      <div class="pro-license-row">
+        <input type="text" id="licenseInput" placeholder="Enter license key (SXLP-XXXX-XXXX)" maxlength="14" autocomplete="off" spellcheck="false">
+        <button id="activateBtn" class="pro-activate-btn">Activate</button>
+      </div>
+      <div id="licenseMsg" class="license-msg"></div>
+      <p class="pro-hint">Purchase once, use forever. No subscription.</p>
+    </div>
+    <div id="proActive" class="pro-active hidden">
+      <span class="pro-badge-inline"> PRO</span>
+      <span class="pro-unlimited">Unlimited audits unlocked</span>
+    </div>
+  </div>
+
+  <!-- Upgrade Modal -->
+  <div id="upgradeModal" class="upgrade-modal hidden">
+    <div class="upgrade-content">
+      <div class="upgrade-title">Unlock Unlimited Audits</div>
+      <div class="upgrade-subtitle">You've used all 3 free audits today. Upgrade to Pro for unlimited access.</div>
+      <div class="upgrade-features">
+        <div class="upgrade-feature">Unlimited SEO audits, no daily cap</div>
+        <div class="upgrade-feature">Full scoring, headings, social previews</div>
+        <div class="upgrade-feature">Schema.org & structured data checks</div>
+        <div class="upgrade-feature">One-time purchase, no subscription</div>
+      </div>
+      <div class="upgrade-price">$4.99 <small>one-time</small></div>
+      <button id="getProBtn" class="upgrade-btn">Get Pro - $4.99</button>
+      <button id="upgradeCloseBtn" class="upgrade-btn-outline">Not now</button>
+    </div>
+  </div>
+
   <div id="loading">
     <div class="spinner"></div>
     <p>Analyzing page SEO...</p>
@@ -24,14 +61,14 @@
     <div class="checks-list" id="checksList"></div>
 
     <section class="section">
-      <h3>📊 Content</h3>
+      <h3> Content</h3>
       <div class="info-row"><span>Word Count</span><span id="wordCount">--</span></div>
       <div class="info-row"><span>Links</span><span id="links">--</span></div>
       <div class="info-row"><span>Language</span><span id="language">--</span></div>
     </section>
 
     <section class="section">
-      <h3>🏷️ Heading Structure</h3>
+      <h3> Heading Structure</h3>
       <div class="heading-bars" id="headingBars">
         <div class="hbar"><span class="hbar-label">H1</span><span class="hbar-count" id="h1Count">0</span></div>
         <div class="hbar"><span class="hbar-label">H2</span><span class="hbar-count" id="h2Count">0</span></div>
@@ -43,7 +80,7 @@
     </section>
 
     <section class="section">
-      <h3>🔗 Social Preview</h3>
+      <h3> Social Preview</h3>
       <div class="social-tabs">
         <button class="social-tab active" data-preview="google">Google</button>
         <button class="social-tab" data-preview="twitter">Twitter</button>
@@ -62,17 +99,17 @@
     </section>
 
     <div class="actions">
-      <button id="copyReport" class="btn btn-primary">📋 Copy Report</button>
+      <button id="copyReport" class="btn btn-primary"> Copy Report</button>
     </div>
 
     <footer>
-      <p class="privacy-note">🔒 Your data stays local. No tracking. No data collection.</p>
-      <p class="version">SEOPulse v1.0.0</p>
+      <p class="privacy-note"> Your data stays local. No tracking. No data collection.</p>
+      <p class="version">SEOPulse v1.0.3</p>
     </footer>
   </div>
 
   <div id="error" class="hidden">
-    <p>⚠️ Unable to analyze this page.</p>
+    <p> Unable to analyze this page.</p>
     <p class="error-hint">Try reloading or check if this is an internal Chrome page.</p>
   </div>
 
