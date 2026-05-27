@@ -1,105 +1,118 @@
-// SEOPulse Background Service Worker (MV3)
-// Pro system: 3 free audits/day, $4.99 lifetime unlock
+﻿// SEOPulse Background Service Worker (MV3)
+// Gumroad License verification: 5 free trials, then activate
 
-const FREE_LIMIT = 3;
-const GUMROAD_URL = 'https://5330159977060.gumroad.com/l/xhzru';
+const GUMROAD_VERIFY_URL = 'https://api.gumroad.com/v2/licenses/verify';
+const PRODUCT_PERMALINK = 'wjlumn';
+const TRIAL_LIMIT = 5;
 
-// License validation — simple local format check
-// Valid format: SXLP-XXXX-XXXX (4-prefix + 2 groups of 4 alphanumeric chars)
-const LICENSE_REGEX = /^SXLP-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+// ─── License storage keys (same as license-manager.js) ───
+const LM = {
+  TRIAL_COUNT: 'lm_trial_count',
+  LICENSE_KEY: 'lm_license_key',
+  ACTIVATED:   'lm_activated',
+  LAST_VERIFY: 'lm_last_verify'
+};
 
-function verifyLicenseCode(code) {
-  return LICENSE_REGEX.test(code.trim().toUpperCase());
+async function isLicenseActivated() {
+  const data = await chrome.storage.local.get(LM.ACTIVATED);
+  return data[LM.ACTIVATED] === 'true';
 }
 
-async function getUsageForToday() {
-  return new Promise(resolve => {
-    chrome.storage.local.get(['usageDate', 'usageCount'], data => {
-      const today = new Date().toDateString();
-      if (data.usageDate !== today) resolve(0);
-      else resolve(data.usageCount || 0);
-    });
-  });
+async function getLicenseTrialCount() {
+  const data = await chrome.storage.local.get(LM.TRIAL_COUNT);
+  return data[LM.TRIAL_COUNT] !== undefined ? parseInt(data[LM.TRIAL_COUNT], 10) : 0;
 }
 
-async function incrementUsage() {
-  const today = new Date().toDateString();
-  return new Promise(resolve => {
-    chrome.storage.local.get(['usageDate', 'usageCount'], data => {
-      if (data.usageDate !== today) {
-        chrome.storage.local.set({ usageDate: today, usageCount: 1 });
-        resolve(1);
-      } else {
-        const count = (data.usageCount || 0) + 1;
-        chrome.storage.local.set({ usageCount: count });
-        resolve(count);
-      }
-    });
-  });
-}
-
-async function checkProStatus() {
-  return new Promise(resolve => {
-    chrome.storage.local.get('isPro', data => resolve(!!data.isPro));
-  });
+async function incrementLicenseTrial() {
+  const count = await getLicenseTrialCount();
+  await chrome.storage.local.set({ [LM.TRIAL_COUNT]: String(count + 1) });
+  return count + 1;
 }
 
 async function canAudit() {
-  const isPro = await checkProStatus();
-  if (isPro) return true;
-  const usage = await getUsageForToday();
-  return usage < FREE_LIMIT;
+  if (await isLicenseActivated()) return { allowed: true, reason: 'activated' };
+  const used = await getLicenseTrialCount();
+  const limit = TRIAL_LIMIT;
+  if (used < limit) return { allowed: true, reason: 'trial', used, limit, remaining: limit - used };
+  return { allowed: false, reason: 'trial_exhausted', used, limit, remaining: 0 };
 }
 
-// Message Handlers
+// ─── Gumroad License Verification ───
+async function verifyLicenseKey(key) {
+  try {
+    const body = `product_permalink=${encodeURIComponent(PRODUCT_PERMALINK)}&license_key=${encodeURIComponent(key.trim())}`;
+    const resp = await fetch(GUMROAD_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body
+    });
+    const data = await resp.json();
+    if (!data.success) return { valid: false, error: 'Invalid license key.' };
+    if (data.purchase && (data.purchase.refunded || data.purchase.disputed || data.purchase.chargebacked)) {
+      return { valid: false, error: 'License refunded or canceled.' };
+    }
+    if (data.uses !== undefined && data.uses >= 2) {
+      return { valid: false, error: 'License used on too many devices.' };
+    }
+    // Increment uses
+    try {
+      await fetch(GUMROAD_VERIFY_URL.replace('/verify', '/increment_uses'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+    } catch (e) {}
+    await chrome.storage.local.set({
+      [LM.LICENSE_KEY]: key.trim(),
+      [LM.ACTIVATED]: 'true',
+      [LM.LAST_VERIFY]: String(Date.now())
+    });
+    return { valid: true, email: data.purchase?.email };
+  } catch (e) {
+    return { valid: false, error: 'Network error. Check your connection.' };
+  }
+}
+
+// ─── Message Handlers ───
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getUsage') {
-    getUsageForToday().then(count => {
-      checkProStatus().then(isPro => {
-        sendResponse({ usage: count, limit: FREE_LIMIT, isPro });
-      });
-    });
+    (async () => {
+      const activated = await isLicenseActivated();
+      const used = await getLicenseTrialCount();
+      const limit = TRIAL_LIMIT;
+      sendResponse({ usage: used, limit, isPro: activated, remaining: Math.max(0, limit - used) });
+    })();
     return true;
   }
   if (request.action === 'verifyLicense') {
-    const code = request.code;
-    const valid = verifyLicenseCode(code);
-    if (valid) {
-      chrome.storage.local.set({ isPro: true }, () => {
-        sendResponse({ success: true });
-      });
-    } else {
-      sendResponse({ success: false, error: 'Invalid license code. Expected format: SXLP-XXXX-XXXX' });
-    }
+    verifyLicenseKey(request.code).then(result => {
+      sendResponse(result.valid ? { success: true } : { success: false, error: result.error });
+    });
     return true;
   }
   if (request.action === 'getGumroadUrl') {
-    sendResponse({ url: GUMROAD_URL });
+    sendResponse({ url: `https://5330159977060.gumroad.com/l/${PRODUCT_PERMALINK}` });
     return false;
   }
   if (request.action === 'checkCanAudit') {
-    canAudit().then(ok => {
-      if (!ok) {
-        incrementUsage(); // increment anyway, then check result
-        getUsageForToday().then(count => {
-          sendResponse({ canAudit: false, usage: count, limit: FREE_LIMIT, error: 'FREE_LIMIT' });
-        });
+    canAudit().then(status => {
+      if (status.allowed) {
+        if (status.reason === 'trial') {
+          incrementLicenseTrial().then(n => {
+            sendResponse({ canAudit: true, usage: n, limit: TRIAL_LIMIT, reason: 'trial' });
+          });
+        } else {
+          sendResponse({ canAudit: true, reason: 'activated' });
+        }
       } else {
-        incrementUsage().then(count => {
-          sendResponse({ canAudit: true, usage: count, limit: FREE_LIMIT });
-        });
+        sendResponse({ canAudit: false, usage: status.used, limit: TRIAL_LIMIT, error: 'TRIAL_EXHAUSTED' });
       }
     });
     return true;
   }
 });
 
-chrome.action.onClicked.addListener((tab) => {
-  // Popup handles everything
-});
-
-chrome.commands?.onCommand?.addListener((command) => {
-  if (command === 'run-audit') {
-    chrome.action.openPopup();
-  }
+chrome.action.onClicked.addListener(() => {});
+chrome.commands?.onCommand?.addListener((cmd) => {
+  if (cmd === 'run-audit') chrome.action.openPopup();
 });

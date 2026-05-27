@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SEOPulse - SEO Audit Tool",
-  "version": "1.0.3",
-  "description": "One-click on-page SEO audit with scoring, heading analysis, social preview, and structured data check. 3 free audits/day, unlimited with Pro.",
+  "version": "1.0.4",
+  "description": "One-click on-page SEO audit: scoring, headings, meta, structured data & social preview. 5 free audits total, unlimited with Pro.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -32,6 +32,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "privacy_policy_url": "https://zhangning94.github.io/seopulse-chrome-extension/",
+  "privacy_policy_url": "https://zhangning94.github.io/seopulse-chrome-extension/privacy-policy.html",
   "minimum_chrome_version": "96"
 }

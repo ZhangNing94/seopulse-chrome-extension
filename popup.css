@@ -4,8 +4,8 @@
   --bg: #f8f9fa;
   --surface: #ffffff;
   --border: #d0d3d8;
-  --primary: #1a73e8;
-  --primary-dark: #1557b0;
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
   --text: #202124;
   --text-secondary: #5f6368;
   --success: #34a853;
@@ -124,7 +124,7 @@ header {
 }
 .pro-license-row input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
 }
 .pro-license-row input::placeholder {
   letter-spacing: 0;

@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scoreBadge = document.getElementById('scoreBadge');
 
   try {
-    // Check usage limit before auditing
-    const usageResp = await chrome.runtime.sendMessage({ action: 'getUsage' });
-    if (usageResp && !usageResp.isPro && usageResp.usage >= usageResp.limit) {
+    // Single atomic gate: check limit + increment trial in one call
+    const auditResp = await chrome.runtime.sendMessage({ action: 'checkCanAudit' });
+    if (!auditResp || !auditResp.canAudit) {
       loading.classList.add('hidden');
       upgradeModal.classList.remove('hidden');
       return;
@@ -85,8 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = injection[0]?.result;
     if (!data) { showError(); return; }
 
-    // Increment usage counter
-    chrome.runtime.sendMessage({ action: 'checkCanAudit' });
     await checkProAndShowUI();
 
     renderResults(data, tab.url);
@@ -116,18 +114,18 @@ async function checkProAndShowUI() {
   const usageDisplay = document.getElementById('usageDisplay');
 
   return new Promise(resolve => {
-    chrome.storage.local.get(['isPro', 'usageCount', 'usageDate'], data => {
-      const today = new Date().toDateString();
-      const usage = data.usageDate === today ? (data.usageCount || 0) : 0;
+    chrome.runtime.sendMessage({ action: 'getUsage' }, resp => {
+      if (!resp) { resolve(); return; }
 
-      if (data.isPro) {
+      if (resp.isPro) {
         proFree.classList.add('hidden');
         proActive.classList.remove('hidden');
       } else {
         proFree.classList.remove('hidden');
         proActive.classList.add('hidden');
-        const left = Math.max(0, 3 - usage);
-        usageDisplay.textContent = left + ' free audit' + (left !== 1 ? 's' : '') + ' today';
+        const limit = window.LICENSE_CONFIG?.trialLimit || 5;
+        const left = Math.max(0, limit - resp.usage);
+        usageDisplay.textContent = `${left} free audit${left !== 1 ? 's' : ''} remaining`;
       }
       resolve();
     });

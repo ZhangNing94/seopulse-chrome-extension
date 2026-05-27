@@ -16,10 +16,10 @@
     <div id="proFree">
       <div class="pro-free-top">
         <button id="upgradeProBtn" class="pro-upgrade-btn"> Upgrade to Pro · $4.99</button>
-        <span id="usageDisplay" class="usage-badge">3 free audits today</span>
+        <span id="usageDisplay" class="usage-badge">5 free audits total</span>
       </div>
       <div class="pro-license-row">
-        <input type="text" id="licenseInput" placeholder="Enter license key (SXLP-XXXX-XXXX)" maxlength="14" autocomplete="off" spellcheck="false">
+        <input type="text" id="licenseInput" placeholder="Enter your Gumroad license key" maxlength="50" autocomplete="off" spellcheck="false">
         <button id="activateBtn" class="pro-activate-btn">Activate</button>
       </div>
       <div id="licenseMsg" class="license-msg"></div>
@@ -35,7 +35,7 @@
   <div id="upgradeModal" class="upgrade-modal hidden">
     <div class="upgrade-content">
       <div class="upgrade-title">Unlock Unlimited Audits</div>
-      <div class="upgrade-subtitle">You've used all 3 free audits today. Upgrade to Pro for unlimited access.</div>
+      <div class="upgrade-subtitle">You've used all 5 free audits. Upgrade to Pro for unlimited access.</div>
       <div class="upgrade-features">
         <div class="upgrade-feature">Unlimited SEO audits, no daily cap</div>
         <div class="upgrade-feature">Full scoring, headings, social previews</div>
@@ -104,7 +104,7 @@
 
     <footer>
       <p class="privacy-note"> Your data stays local. No tracking. No data collection.</p>
-      <p class="version">SEOPulse v1.0.3</p>
+      <p class="version">SEOPulse v1.0.4</p>
     </footer>
   </div>
 
@@ -115,6 +115,8 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="license-config.js"></script>
+  <script src="license-manager.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
